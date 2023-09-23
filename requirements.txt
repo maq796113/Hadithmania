@@ -1,7 +1,7 @@
-python-dotenv 
+dotenv_vault
 discord 
 Flask 
 python-bidi 
-arabic-reshaper 
+requests
 
 
