@@ -3,8 +3,6 @@ import typing
 import discord
 from discord.ext import commands
 from getHadith import get_hadith
-
-from keep_it_running import keep_running
 from discord import app_commands
 import sys
 
@@ -140,7 +138,7 @@ def run():
     #     if isinstance(error, NotOwner):
     #         await ctx.send("Permission denied.")
 
-    keep_running()
+    
     bot.run(settings.DISCORD_APT_SECRET, root_logger=True)
 
 
