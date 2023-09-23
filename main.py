@@ -3,11 +3,11 @@ import typing
 import discord
 from discord.ext import commands
 from getHadith import get_hadith
-import settings
+
 from keep_it_running import keep_running
 from discord import app_commands
 import sys
-logger = settings.logging.getLogger("bot")
+
 
 
 class NotOwner(commands.CheckFailure):
@@ -161,5 +161,8 @@ if __name__ == "__main__":
         content = f"TOKEN='{token}'"
         with open(file_path, "w") as env_file:
             env_file.write(content)
+    import settings
+
+    logger = settings.logging.getLogger("bot")
 
     run()
