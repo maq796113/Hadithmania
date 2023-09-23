@@ -1,4 +1,4 @@
-dotenv_vault
+python-dotenv-vault
 discord 
 Flask 
 python-bidi 
