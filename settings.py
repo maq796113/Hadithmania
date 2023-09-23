@@ -2,8 +2,6 @@ import pathlib
 import os
 import logging
 from logging.config import dictConfig
-
-import discord
 from dotenv_vault import load_dotenv
 
 load_dotenv()
@@ -13,9 +11,8 @@ BASE_DIR = pathlib.Path(__file__).parent
 
 SLASHCMDS_DIR = BASE_DIR / "slashcmds"
 
-COGS_DIR = BASE_DIR / "cogs"
+# COGS_DIR = BASE_DIR / "cogs"
 
-GUILDS_ID = discord.Object(id=int(os.getenv("GUILD")))
 
 LOGGING_CONFIG = {
     "version": 1,
