@@ -3,5 +3,5 @@ discord
 Flask 
 python-bidi 
 requests
-
+waitress
 
