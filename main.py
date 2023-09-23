@@ -1,11 +1,12 @@
+import os
 import typing
 import discord
 from discord.ext import commands
-from getHadith import get_hadith
+from get_hadith import get_hadith
 import settings
 from keep_it_running import keep_running
 from discord import app_commands
-
+import sys
 logger = settings.logging.getLogger("bot")
 
 
@@ -144,4 +145,21 @@ def run():
 
 
 if __name__ == "__main__":
+    file_path = ".env"
+    if (args_count := len(sys.argv)) > 2:
+        print(f"One argument expected, got {args_count - 1}")
+        raise SystemExit(2)
+
+    elif args_count < 2:
+        print("You must specify the target directory")
+        raise SystemExit(2)
+
+    token = sys.argv[1]
+    if os.path.isfile(file_path):
+        print(f"{file_path} already exists")
+    else:
+        content = f"TOKEN='{token}'"
+        with open(file_path, "w") as env_file:
+            env_file.write(content)
+
     run()
