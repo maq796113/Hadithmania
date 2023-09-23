@@ -2,7 +2,7 @@ import os
 import typing
 import discord
 from discord.ext import commands
-from get_hadith import get_hadith
+from getHadith import get_hadith
 import settings
 from keep_it_running import keep_running
 from discord import app_commands
