@@ -1,6 +1,5 @@
 python-dotenv-vault
 discord 
-Flask 
 python-bidi 
 requests
 waitress
