@@ -1,1 +1,1 @@
-# Hadithmania-1
+# Hadithmania Discord Bot
