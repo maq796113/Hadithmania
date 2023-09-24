@@ -1,1 +1,1 @@
-web: python main.py runserver 8080
+worker: python main.py
