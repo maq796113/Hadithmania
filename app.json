@@ -1,1 +1,12 @@
-
+{
+  "name": "hadithmania",
+  "scripts": {
+    "start": "python main.py"
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "Free"
+    }
+  }
+}
