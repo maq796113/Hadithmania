@@ -144,21 +144,21 @@ def run():
 
 if __name__ == "__main__":
     file_path = ".env"
-    if (args_count := len(sys.argv)) > 2:
-        print(f"One argument expected, got {args_count - 1}")
-        raise SystemExit(2)
+    
 
-    elif args_count < 2:
-        print("You must specify the target directory")
-        raise SystemExit(2)
-
-    token = sys.argv[1]
+    token = os.getenv('TOKEN_ID')
+    if env_variable_value is not None:
+        print(f"The value of the environment variable is: {token}")
+    else:
+        print("The environment variable is not set.")
+    
     if os.path.isfile(file_path):
         print(f"{file_path} already exists")
     else:
         content = f"TOKEN='{token}'"
         with open(file_path, "w") as env_file:
             env_file.write(content)
+    
     import settings
 
     logger = settings.logging.getLogger("bot")
