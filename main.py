@@ -147,7 +147,7 @@ if __name__ == "__main__":
     
 
     token = os.getenv('TOKEN_ID')
-    if env_variable_value is not None:
+    if token is not None:
         print(f"The value of the environment variable is: {token}")
     else:
         print("The environment variable is not set.")
