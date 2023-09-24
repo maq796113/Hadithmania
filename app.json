@@ -3,5 +3,11 @@
   "scripts": {
     "start": "python main.py"
   },
-  "description": "This version is for temporary deployment."
+  "description": "This version is for temporary deployment.",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "Free"
+    }
+  }
 }
