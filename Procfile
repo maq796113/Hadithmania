@@ -1,1 +1,1 @@
-python main.py runserver 8080
+web: python main.py runserver 8080
