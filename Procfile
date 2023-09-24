@@ -1,1 +1,1 @@
-web: gunicorn gettingstarted.wsgi
+python main.py runserver 8080
