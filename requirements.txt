@@ -2,5 +2,5 @@ python-dotenv-vault
 discord 
 python-bidi 
 requests
-waitress
+
 
