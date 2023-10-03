@@ -111,7 +111,7 @@ def run():
 
             try:
                 embed = discord.Embed(
-                    title=f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}",
+                    title=f"Chapter {chap_num}: {chap_title_eng}",
                     url=f"https://sunnah.com/{book_col}:{hnum.replace(' ', '')}",
                     description=f"**{book_collection} {hnum}**",
                     color=discord.Color.gold(),
