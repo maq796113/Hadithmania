@@ -128,7 +128,12 @@ def run():
 
                 embed.add_field(
                     name="English Translation",
-                    value=f"{english_chunk}",
+                    value=english_chunk,
+                    inline=False,
+                )
+                embed.add_field(
+                    name="Grading",
+                    value=f"**hukm**",
                     inline=False,
                 )
                 logger.info(f"I am at iteration {i}")
