@@ -1,4 +1,3 @@
-import os
 import settings
 import typing
 import discord
