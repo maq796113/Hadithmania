@@ -1,4 +1,5 @@
 import os
+import settings
 import typing
 import discord
 from discord.ext import commands
@@ -6,7 +7,7 @@ from getHadith import get_hadith
 from discord import app_commands
 import sys
 
-
+logger = settings.logging.getLogger("bot")
 
 class NotOwner(commands.CheckFailure):
     ...
@@ -25,14 +26,13 @@ def run():
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
+    field_char_limit = 1025  # Discord's limit
     bot = commands.Bot(command_prefix="&", intents=intents)
 
     @bot.event
     async def on_ready():
         logger.info("` بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ`")
         logger.info(f"We are ready--------\n{bot.user.name}\n---------\n{bot.user.id}")
-
-        logger.info(f"Guild ID: {bot.guilds[0].id}")
 
         for slashcmds_file in settings.SLASHCMDS_DIR.glob("*py"):
             if slashcmds_file.name != "__init__.py":
@@ -72,21 +72,15 @@ def run():
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
-    prefixes = {
-        "Sahih": ["bukhari", "muslim"],
-        "Sunan": ["nasai", "abudawud", "darimi", "ibnmajah"],
-        "Jami": ["tirmidhi"],
-        "Musnad": ["ahmad"],
-        "Muwatta": ["malik"]
-    }
+    collections = ["Sahih Bukhari", "Sahih Muslim", "Sunan Nasai", "Sunan Abu Dawud", "Sunan Ibn Majah", "Musnad Ahmad",
+                   "Jami Tirmidhi", "Muwatta Malik"]
 
     async def get_hadith_from_collection_booknum_hadithnum_autocomplete(
             interaction: discord.Interaction,
             current: str
     ) -> typing.List[app_commands.Choice[str]]:
         data = []
-        for collection_choice in ['bukhari', 'muslim', 'nasai', 'abudawud', 'darimi', 'ibnmajah', 'tirmidhi', 'ahmad',
-                                  'malik']:
+        for collection_choice in collections:
             if current.lower() in collection_choice.lower():
                 data.append(app_commands.Choice(name=collection_choice, value=collection_choice))
         return data
@@ -98,31 +92,50 @@ def run():
                                                            book_num: int,
                                                            hadith_num: int):
         await interaction.response.defer(ephemeral=True)
-        book_col = book_collection
+        
+        extract = book_collection.split()[1:]
+        if len(extract) > 1:
+            book_col = ''.join(extract).lower()
+        else:
+            book_col = extract[0].lower()
+
         if get_hadith(book_col, book_num, hadith_num) is None:
             await interaction.followup.send("An error occurred while fetching the hadith.")
             return
-        arabic, english, hukm, hnum = get_hadith(book_col, book_num, hadith_num)
-        for key, values in prefixes.items():
-            if book_col in values:
+        arabic, english, hukm, hnum, chap_title_eng, chap_title_ar, chap_num = get_hadith(book_col, book_num, hadith_num)
+        english_chunks = split_text_into_chunks(english, field_char_limit)
+
+        arabic_part_is_needed = True if len(arabic) < field_char_limit else False
+
+        for i, english_chunk in enumerate(english_chunks):
+
+            try:
                 embed = discord.Embed(
-                    title=f"{key} {book_col.capitalize()} {hnum}",
+                    title=f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}",
                     url=f"https://sunnah.com/{book_col}:{hnum.replace(' ', '')}",
-                    description="Here is your requested hadith",
-                    color=discord.Color.green(),
+                    description=f"**{book_collection} {hnum}**",
+                    color=discord.Color.gold(),
                 )
                 embed.set_thumbnail(
                     url="https://upload.wikimedia.org/wikipedia/commons/b/b1/Hadith1.png"
                 )
-                embed.add_field(name="Arabic", value=arabic, inline=False)
+                if i == 0 and arabic_part_is_needed:
+                    embed.add_field(
+                        name="Arabic",
+                        value=arabic,
+                        inline=False
+                    )
+
                 embed.add_field(
                     name="English Translation",
-                    value=f"{english}\n\n**Grade: {hukm}**",
+                    value=f"{english_chunk}",
                     inline=False,
                 )
+                logger.info(f"I am at iteration {i}")
+                logger.debug("Constructed embed: %s", embed.to_dict())
                 await interaction.followup.send(embed=embed)
-                break
-
+            except Exception as e:
+                logger.error(f"An error occurred while creating or sending the embed: {str(e)}")
     @get_hadith_from_collection_booknum_hadithnum.error
     async def get_hadith_from_collection_booknum_hadithnum_error(interaction: discord.Interaction, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -143,24 +156,4 @@ def run():
 
 
 if __name__ == "__main__":
-    file_path = ".env"
-    
-
-    token = os.getenv('TOKEN_ID')
-    if token is not None:
-        print(f"The value of the environment variable is: {token}")
-    else:
-        print("The environment variable is not set.")
-    
-    if os.path.isfile(file_path):
-        print(f"{file_path} already exists")
-    else:
-        content = f"TOKEN='{token}'"
-        with open(file_path, "w") as env_file:
-            env_file.write(content)
-    
-    import settings
-
-    logger = settings.logging.getLogger("bot")
-
     run()
