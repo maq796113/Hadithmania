@@ -3,6 +3,7 @@ import typing
 import discord
 from discord.ext import commands
 from getHadith import get_hadith
+from split_embedding_field_value_text_to_chunks import split_text_into_chunks
 from discord import app_commands
 import sys
 
