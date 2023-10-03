@@ -2,10 +2,12 @@ import pathlib
 import os
 import logging
 from logging.config import dictConfig
-from dotenv_vault import load_dotenv
 
-load_dotenv()
-DISCORD_APT_SECRET = os.getenv("TOKEN")
+
+
+DISCORD_APT_SECRET = os.getenv("TOKEN_ID")
+HADITH_API_TOKEN = os.getenv("HADITH_API_TOKEN_ID")
+
 
 BASE_DIR = pathlib.Path(__file__).parent
 
