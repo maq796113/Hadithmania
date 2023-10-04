@@ -20,6 +20,10 @@ def get_hadith(book_collection: str, book_num: int, hadith_num: int):
         headers=headers,
     )
     hadith_dict = request.json()
+    if hadith_dict:
+        logger.info("the request worked")
+    else:
+        logger.info("the request failed")
     _iter = 0
 
     for data in hadith_dict["data"]:
