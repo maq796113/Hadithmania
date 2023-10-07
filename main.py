@@ -86,6 +86,9 @@ def run():
         return data
 
     @bot.tree.command(name="hadīth", description="Get your desired hadith from any specified hadith collection")
+    @app_commands.rename(book_collection="Hadith Book Collection")
+    @app_commands.rename(book_num="Hadith Book Number")
+    @app_commands.rename(hadith_num="Hadith Number")
     @app_commands.autocomplete(book_collection=get_hadith_from_collection_booknum_hadithnum_autocomplete)
     async def get_hadith_from_collection_booknum_hadithnum(interaction: discord.Interaction,
                                                            book_collection: str,
