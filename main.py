@@ -1,13 +1,14 @@
-import settings
 import typing
 import discord
 from discord.ext import commands
 from getHadith import get_hadith
+import settings
+
 from split_embedding_field_value_text_to_chunks import split_text_into_chunks
 from discord import app_commands
-import sys
 
 logger = settings.logging.getLogger("bot")
+
 
 class NotOwner(commands.CheckFailure):
     ...
@@ -33,6 +34,8 @@ def run():
     async def on_ready():
         logger.info("` بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ`")
         logger.info(f"We are ready--------\n{bot.user.name}\n---------\n{bot.user.id}")
+
+        logger.info(f"Guild ID: {bot.guilds[0].id}")
 
         for slashcmds_file in settings.SLASHCMDS_DIR.glob("*py"):
             if slashcmds_file.name != "__init__.py":
@@ -92,17 +95,20 @@ def run():
                                                            book_num: int,
                                                            hadith_num: int):
         await interaction.response.defer(ephemeral=True)
-        
+        book_col: str = ""
         extract = book_collection.split()[1:]
         if len(extract) > 1:
             book_col = ''.join(extract).lower()
         else:
             book_col = extract[0].lower()
 
+        logger.info(f"Im here and the data we have is; {book_col}")
         if get_hadith(book_col, book_num, hadith_num) is None:
             await interaction.followup.send("An error occurred while fetching the hadith.")
             return
-        arabic, english, hukm, hnum, chap_title_eng, chap_title_ar, chap_num = get_hadith(book_col, book_num, hadith_num)
+
+        arabic, english, hukm, hnum, chap_title_eng, chap_title_ar, chap_num = get_hadith(book_col, book_num,
+                                                                                          hadith_num)
         english_chunks = split_text_into_chunks(english, field_char_limit)
 
         arabic_part_is_needed = True if len(arabic) < field_char_limit else False
@@ -111,9 +117,9 @@ def run():
 
             try:
                 embed = discord.Embed(
-                    title=f"Chapter {chap_num}: {chap_title_eng}",
+                    title=f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}",
                     url=f"https://sunnah.com/{book_col}:{hnum.replace(' ', '')}",
-                    description=f"**{book_collection} {hnum}**",
+                    description=f"**{i+1} of {len(english_chunks)}**",
                     color=discord.Color.gold(),
                 )
                 embed.set_thumbnail(
@@ -128,12 +134,7 @@ def run():
 
                 embed.add_field(
                     name="English Translation",
-                    value=english_chunk,
-                    inline=False,
-                )
-                embed.add_field(
-                    name="Grading",
-                    value=f"**{hukm}**",
+                    value=f"{english_chunk}",
                     inline=False,
                 )
                 logger.info(f"I am at iteration {i}")
@@ -141,6 +142,8 @@ def run():
                 await interaction.followup.send(embed=embed)
             except Exception as e:
                 logger.error(f"An error occurred while creating or sending the embed: {str(e)}")
+
+
     @get_hadith_from_collection_booknum_hadithnum.error
     async def get_hadith_from_collection_booknum_hadithnum_error(interaction: discord.Interaction, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -156,7 +159,7 @@ def run():
     #     if isinstance(error, NotOwner):
     #         await ctx.send("Permission denied.")
 
-    
+    # keep_running()
     bot.run(settings.DISCORD_APT_SECRET, root_logger=True)
 
 
