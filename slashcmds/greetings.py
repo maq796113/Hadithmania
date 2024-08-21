@@ -15,7 +15,7 @@ class GreetingsGroup(app_commands.Group):
         return data
     
     @app_commands.command(description="Say Salam in Arabic")
-    @app_commands.autocomplete(book_collection=gender_autocomplete)
+    @app_commands.autocomplete(gender=gender_autocomplete)
     async def arabic(self, interaction: discord.Interaction, gender: str, member: discord.Member):
         if gender == "male":     
             embed = discord.Embed(
@@ -33,7 +33,7 @@ class GreetingsGroup(app_commands.Group):
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(description="Say Salam in English")
-    @app_commands.autocomplete(book_collection=gender_autocomplete)
+    @app_commands.autocomplete(gender=gender_autocomplete)
     async def english(self, interaction: discord.Interaction, gender: str, member: discord.Member):
         if gender == "male":
             embed = discord.Embed(
@@ -53,4 +53,3 @@ class GreetingsGroup(app_commands.Group):
 
 async def setup(bot):
     bot.tree.add_command(GreetingsGroup(name="salam", description="Says Salam to the user"))
-
