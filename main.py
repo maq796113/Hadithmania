@@ -41,7 +41,7 @@ def run():
             if slashcmds_file.name != "__init__.py":
                 await bot.load_extension(f"slashcmds.{slashcmds_file.name[:-3]}")
 
-    @bot.command()
+    @bot.tree.command()
     @commands.guild_only()
     @commands.is_owner()
     async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object],
