@@ -5,6 +5,7 @@ import typing
 class GreetingsGroup(app_commands.Group):
   
     async def gender_autocomplete(
+        self,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:
@@ -16,7 +17,7 @@ class GreetingsGroup(app_commands.Group):
     
     @app_commands.command(description="Say Salam in Arabic")
     @app_commands.autocomplete(gender=gender_autocomplete)
-    async def arabic(self, interaction: discord.Interaction, gender: str, member: discord.Member):
+    async def arabic(self, interaction: discord.Interaction, gender: str, *, member: discord.Member):
         if gender == "male":     
             embed = discord.Embed(
                 title="Akhi",
@@ -34,7 +35,8 @@ class GreetingsGroup(app_commands.Group):
 
     @app_commands.command(description="Say Salam in English")
     @app_commands.autocomplete(gender=gender_autocomplete)
-    async def english(self, interaction: discord.Interaction, gender: str, member: discord.Member):
+    async def english(self, interaction: discord.Interaction, gender: str, *, member: discord.Member):
+        
         if gender == "male":
             embed = discord.Embed(
                 title='Akhi',
