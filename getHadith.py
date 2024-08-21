@@ -12,23 +12,14 @@ def get_hadith(book_collection: str, book_num: int, hadith_num: int):
     h.ignore_images = True
     h.ignore_tables = True
 
-    url = f"https://api.sunnah.com/v1/collections/{book_collection}/books/{book_num}/hadiths"
-    payload = "{}"
-    headers = {'x-api-key': 'SqD712P3E82xnwOAEOkGd5JZH8s9wRR24TqNFzjk'}
-    page = 1
-    if hadith_num > 100:
-        page = hadith_num % 1000 // 100
-        hadith_num = hadith_num - 100
-
-    params = {
-        "limit": 100,
-        "page": page
-    }
-    hadith_dict = requests.request("GET", url, data=payload, headers=headers, params=params).json()
-    if hadith_dict:
-        logger.info("the request worked")
-    else:
-        logger.info("the request failed")
+    payload = {"content-type": "application/json"}
+    headers = {"x-api-key": settings.HADITH_API_TOKEN}
+    request = requests.get(
+        f"https://api.sunnah.com/v1/collections/{book_collection}/books/{book_num}/hadiths",
+        params=payload,
+        headers=headers,
+    )
+    hadith_dict = request.json()
     _iter = 0
 
     for data in hadith_dict["data"]:
