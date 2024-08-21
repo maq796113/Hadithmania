@@ -112,12 +112,13 @@ def run():
         english_chunks = split_text_into_chunks(english, field_char_limit)
 
         arabic_part_is_needed = True if len(arabic) < field_char_limit else False
-
+        title = f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}"
+        embed = None
         for i, english_chunk in enumerate(english_chunks):
 
             try:
                 embed = discord.Embed(
-                    title=f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}",
+                    title=title if len(title) < 257 else title[:250]+".....",
                     url=f"https://sunnah.com/{book_col}:{hnum.replace(' ', '')}",
                     description=f"**{i+1} of {len(english_chunks)}**",
                     color=discord.Color.gold(),
