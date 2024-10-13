@@ -94,7 +94,7 @@ def run():
                                                            book_collection: str,
                                                            book_num: int,
                                                            hadith_num: int):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=False)
         book_col: str = ""
         extract = book_collection.split()[1:]
         if len(extract) > 1:
