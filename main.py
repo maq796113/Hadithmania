@@ -102,7 +102,7 @@ def run():
         else:
             book_col = extract[0].lower()
 
-        logger.info(f"Im here and the data we have is; {book_col}")
+        
         
         try:
             result = await get_hadith(book_col, book_num, hadith_num)
