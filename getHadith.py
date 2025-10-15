@@ -1,12 +1,12 @@
 import html2text
-import requests
+import aiohttp
 import settings
 import arabic_reshaper
 
 logger = settings.logging.getLogger("bot")
 
 
-def get_hadith(book_collection: str, book_num: int, hadith_num: int):
+async def get_hadith(book_collection: str, book_num: int, hadith_num: int):
     h = html2text.HTML2Text()
     h.ignore_links = True
     h.ignore_images = True
@@ -14,50 +14,49 @@ def get_hadith(book_collection: str, book_num: int, hadith_num: int):
 
     payload = {"content-type": "application/json"}
     headers = {"x-api-key": settings.HADITH_API_TOKEN}
-    request = requests.get(
-        f"https://api.sunnah.com/v1/collections/{book_collection}/books/{book_num}/hadiths",
-        params=payload,
-        headers=headers,
-    )
-    hadith_dict = request.json()
-    _iter = 0
+    
+    url = f"https://api.sunnah.com/v1/collections/{book_collection}/books/{book_num}/hadiths/{hadith_num}"
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=payload, headers=headers, timeout=10) as response:
+                if response.status != 200:
+                    logger.error(f"API returned status {response.status}")
+                    return None
+                data = await response.json()
 
-    for data in hadith_dict["data"]:
+        hadith_chap_title_eng = data["hadith"][0]["chapterTitle"]
 
-        if _iter == hadith_num - 1:
+        hadith_eng = h.handle(data["hadith"][0]["body"]).replace("\n", "")
 
-            hadith_chap_title_eng = data["hadith"][0]["chapterTitle"]
-
-            hadith_eng = h.handle(data["hadith"][0]["body"]).replace("\n", "")
-
-            if data["hadith"][0]["grades"]:
-                grading = data["hadith"][0]["grades"][0]["grade"]
-            else:
-                grading = data["hadith"][1]["grades"][0]["grade"] + f"({data['hadith'][1]['grades'][0]['graded_by']})"
-
-            hadith_chap_title_ar = data["hadith"][1]["chapterTitle"]
-
-            hadith_ar = h.handle(data["hadith"][1]["body"]).replace("\n", "").replace("‏.‏", "")
-            reshaped_hadith_ar = arabic_reshaper.reshape(hadith_ar)
-
-            hadith_num = data["hadithNumber"]
-            chapter_num = data["chapterId"].replace(".00", "")
-
-            if '\"' in hadith_eng:
-                hadith_eng = put_asterisk_in_quotes(hadith_eng)
-
-            return (
-                reshaped_hadith_ar,
-                hadith_eng,
-                grading,
-                hadith_num,
-                hadith_chap_title_eng,
-                hadith_chap_title_ar,
-                chapter_num
-            )
-
+        if data["hadith"][0]["grades"]:
+            grading = data["hadith"][0]["grades"][0]["grade"]
         else:
-            _iter += 1
+            grading = data["hadith"][1]["grades"][0]["grade"] + f"({data['hadith'][1]['grades'][0]['graded_by']})"
+
+        hadith_chap_title_ar = data["hadith"][1]["chapterTitle"]
+
+        hadith_ar = h.handle(data["hadith"][1]["body"]).replace("\n", "").replace("‏.‏", "")
+        reshaped_hadith_ar = arabic_reshaper.reshape(hadith_ar)
+
+        hadith_num_str = data["hadithNumber"]
+        chapter_num = data["chapterId"].replace(".00", "")
+
+        if '\"' in hadith_eng:
+            hadith_eng = put_asterisk_in_quotes(hadith_eng)
+
+        return (
+            reshaped_hadith_ar,
+            hadith_eng,
+            grading,
+            hadith_num_str,
+            hadith_chap_title_eng,
+            hadith_chap_title_ar,
+            chapter_num
+        )
+    except Exception as e:
+        logger.error(f"Error in get_hadith: {str(e)}")
+        return None
 
 
 def put_asterisk_in_quotes(text: str) -> str:
