@@ -103,20 +103,21 @@ def run():
             book_col = extract[0].lower()
 
         logger.info(f"Im here and the data we have is; {book_col}")
-        if get_hadith(book_col, book_num, hadith_num) is None:
-            await interaction.followup.send("An error occurred while fetching the hadith.")
-            return
+        
+        try:
+            result = await get_hadith(book_col, book_num, hadith_num)
+            if result is None:
+                await interaction.followup.send("An error occurred while fetching the hadith.")
+                return
 
-        arabic, english, hukm, hnum, chap_title_eng, chap_title_ar, chap_num = get_hadith(book_col, book_num,
-                                                                                          hadith_num)
-        english_chunks = split_text_into_chunks(english, field_char_limit)
+            arabic, english, hukm, hnum, chap_title_eng, chap_title_ar, chap_num = result
+            english_chunks = split_text_into_chunks(english, field_char_limit)
 
-        arabic_part_is_needed = True if len(arabic) < field_char_limit else False
-        title = f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}"
-        embed = None
-        for i, english_chunk in enumerate(english_chunks):
+            arabic_part_is_needed = True if len(arabic) < field_char_limit else False
+            title = f"Chapter {chap_num}: {chap_title_eng}\n\n{book_collection} {hnum}"
+            embed = None
+            for i, english_chunk in enumerate(english_chunks):
 
-            try:
                 embed = discord.Embed(
                     title=title if len(title) < 257 else title[:250]+".....",
                     url=f"https://sunnah.com/{book_col}:{hnum.replace(' ', '')}",
@@ -141,24 +142,9 @@ def run():
                 logger.info(f"I am at iteration {i}")
                 logger.debug("Constructed embed: %s", embed.to_dict())
                 await interaction.followup.send(embed=embed)
-            except Exception as e:
-                logger.error(f"An error occurred while creating or sending the embed: {str(e)}")
-
-
-    @get_hadith_from_collection_booknum_hadithnum.error
-    async def get_hadith_from_collection_booknum_hadithnum_error(interaction: discord.Interaction, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await interaction.response.send_message("Some required argument(s) are missing")
-
-    # @bot.command()
-    # @is_owner()
-    # async def reload(cog: str):
-    #     await bot.reload_extension(f"cogs. {cog.lower()}")
-    #
-    # @reload.error
-    # async def reload_error(ctx, error):
-    #     if isinstance(error, NotOwner):
-    #         await ctx.send("Permission denied.")
+        except Exception as e:
+            logger.error(f"An error occurred in the command: {str(e)}")
+            await interaction.followup.send("An unexpected error occurred while processing the request.")
 
     # keep_running()
     bot.run(settings.DISCORD_APT_SECRET, root_logger=True)
