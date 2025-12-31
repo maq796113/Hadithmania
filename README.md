@@ -114,5 +114,4 @@ Because when differences arise…
 
 🕋 *May this project be a source of ongoing reward (Ṣadaqah Jāriyah)* 🤲✨
 
-```
-```
+
